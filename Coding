@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+df=pd.read_csv("creditcard.csv")
+df.head()
+df.tail()
+df.info()
+#checking the number of missing_values
+df.isnull().sum()
+df["Class"].value_counts()  
+#highly unbalanced data
+#0-->Normal Transaction
+#1-->fraudlent Transaction
+norm=df[df.Class==0]
+fraud=df[df.Class==1]
+norm.shape,fraud.shape
+#statistical measures of the data
+norm.Amount.describe()
+fraud.Amount.describe()
+#compare the values for both transaction
+df.groupby("Class").mean()
+#undersempling
+#build a sample datasets containing similar distribution and fraudulent transaction
+#number of fraudulent transaction->492
+norm_sample=norm.sample(n=492)
+#concetenating two dataframs
+new_data=pd.concat([norm_sample,fraud],axis=0)
+new_data.head()
+new_data.tail()
+new_data["Class"].value_counts()
+new_data.groupby("Class").mean()
+#splitting tha data into features & target
+X=new_data.drop(columns="Class",axis=1)
+Y=new_data["Class"]
+print(X)
+print(Y)
+#split data into training and testing data
+X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.2,stratify=Y,random_state=2)
+X.shape,X_train.shape,X_test.shape
+#model training
+lr=LogisticRegression()
+#training the logistic regression model with training data
+lr.fit(X_train,Y_train)
+#Model Evaluation
+from sklearn.metrics import accuracy_score
+#accuracy on training data
+pred=lr.predict(X_train)
+accuracy=accuracy_score(pred,Y_train)
+print("Accuracy on Training Data :",accuracy)
+#accuracy on testing data
+pred_test=lr.predict(X_test)
+accuracy_test=accuracy_score(pred_test,Y_test)
+print("Accuracy on Testing Data :",accuracy_test)
+
+
+
+
+
+
+
+
+
+
+
+
